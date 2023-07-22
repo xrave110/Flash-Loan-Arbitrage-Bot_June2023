@@ -4,7 +4,7 @@ const networkConfig = {
     },
     10: {
         name: "optimism",
-        usdc: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747",
+        usdc: "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
         weth: "0x4200000000000000000000000000000000000006",
         link: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
         dai: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",

@@ -8,6 +8,7 @@ import "../interfaces/ITradeExecutor.sol";
 import "../interfaces/IArbitrageExecutor.sol";
 import "./Whitelisted.sol";
 import "../lib/Arbitrage.sol";
+import "hardhat/console.sol";
 
 contract ArbitrageExecutor is
     FlashLoanSimpleReceiverBase,
@@ -24,19 +25,24 @@ contract ArbitrageExecutor is
         tradeExecutor = ITradeExecutor(executorAddress);
     }
 
-    function execute(Arbitrage.Opportunity memory arbitrage) external {
+    function execute(
+        address tokenFrom,
+        address tokenTo,
+        address dex1,
+        address dex2
+    ) external {
         address receiverAddress = address(this);
         uint16 referralCode = 0;
 
-        bytes memory params = abi.encode(
-            arbitrage.firstTransaction,
-            arbitrage.secondTransaction
-        );
+        bytes memory params = abi.encode(tokenFrom, tokenTo, dex1, dex2);
+
+        console.log(tokenFrom);
+        console.log(tokenTo);
 
         POOL.flashLoanSimple(
             receiverAddress,
-            arbitrage.firstTransaction.tokenFrom,
-            arbitrage.firstTransaction.amount,
+            tokenFrom,
+            10000000000,
             params,
             referralCode
         );
@@ -49,24 +55,22 @@ contract ArbitrageExecutor is
         address initiator,
         bytes calldata params
     ) external override returns (bool) {
-        (
-            Arbitrage.Transaction memory firstTransaction,
-            Arbitrage.Transaction memory secondTransation
-        ) = abi.decode(params, (Arbitrage.Transaction, Arbitrage.Transaction));
+        (address tokenFrom, address tokenTo, address dex1, address dex2) = abi
+            .decode(params, (address, address, address, address));
+        uint256 _amount = 10000000000;
+
+        IERC20(tokenFrom).approve(address(tradeExecutor), _amount);
 
         uint256 amountPurchased = tradeExecutor.executeTrade(
-            firstTransaction.exchange,
-            firstTransaction.tokenFrom,
-            firstTransaction.tokenTo,
-            firstTransaction.amount
+            dex1,
+            tokenFrom,
+            tokenTo,
+            _amount
         );
 
-        tradeExecutor.executeTrade(
-            secondTransation.exchange,
-            secondTransation.tokenFrom,
-            secondTransation.tokenTo,
-            amountPurchased
-        );
+        IERC20(tokenTo).approve(address(tradeExecutor), amountPurchased);
+
+        tradeExecutor.executeTrade(dex2, tokenTo, tokenFrom, amountPurchased);
 
         uint256 totalAmount = amount + premium;
         IERC20(asset).approve(address(POOL), totalAmount);

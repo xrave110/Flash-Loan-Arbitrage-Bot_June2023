@@ -160,18 +160,51 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
         return latestUniswapPrice;
     }
 
+    // function getVeloSwapPrice(
+    //     address tokenIn,
+    //     address tokenOut
+    // ) public view returns (uint256) {
+    //     IVeloRouter veloRouter = IVeloRouter(VELO_ROUTER);
+    //     //IVeloRouter.route[] memory routes;
+    //     // routes = new IVeloRouter.route[](1);
+    //     // routes[0].from = tokenIn;
+    //     // routes[0].to = tokenOut;
+    //     // routes[0].stable = false;
+
+    //     // uint256[] memory amounts = veloRouter.getAmountsOut(1e18, routes);
+    //     (uint reserveA, uint reserveB) = veloRouter.getReserves(
+    //         tokenIn,
+    //         tokenOut,
+    //         false
+    //     );
+    //     uint256 amounts = (reserveB * 10 ** 18) / reserveA;
+    //     return amounts;
+    // }
+
+    /* Warning!! DAI specific code */
     function getVeloSwapPrice(
         address tokenIn,
         address tokenOut
     ) public view returns (uint256) {
         IVeloRouter veloRouter = IVeloRouter(VELO_ROUTER);
-        //IVeloRouter.route[] memory routes;
+        // IVeloRouter.route[] memory routes;
         // routes = new IVeloRouter.route[](1);
         // routes[0].from = tokenIn;
-        // routes[0].to = tokenOut;
+        // routes[0].to = 0xc40F949F8a4e094D1b49a23ea9241D289B7b2819;
         // routes[0].stable = false;
 
-        // uint256[] memory amounts = veloRouter.getAmountsOut(1e18, routes);
+        // routes[1].from = 0xc40F949F8a4e094D1b49a23ea9241D289B7b2819;
+        // routes[1].to = tokenOut;
+        // routes[1].stable = true;
+        // IERC20[] memory conectors = new IERC20[](3);
+        // conectors[0] = IERC20(tokenIn);
+        // conectors[1] = IERC20(0xc40F949F8a4e094D1b49a23ea9241D289B7b2819);
+        // conectors[3] = IERC20(tokenOut);
+        // uint256[] memory amounts = veloOracle.getManyRatesWithConnectors(
+        //     2,
+        //     conectors
+        // );
+        //uint256[] memory amounts = veloRouter.getAmountsOut(1e18, routes);
         (uint reserveA, uint reserveB) = veloRouter.getReserves(
             tokenIn,
             tokenOut,
