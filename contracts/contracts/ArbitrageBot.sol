@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.12 <=0.8.19;
+pragma solidity ^0.8.0;
 
 import "../interfaces/IArbitrageFinder.sol";
 import "../interfaces/IArbitrageExecutor.sol";
@@ -18,12 +18,19 @@ contract ArbitrageBot is Whitelisted {
     }
 
     function execute(address token1, address token2) external onlyWhitelisted {
-        // (bool isFound, Arbitrage.Opportunity memory arbitrage) = arbitrageFinder
-        //     .find(token1, token2);
-        // if (isFound) {
-        //     emit ArbitrageOpportunity(true);
-        //     arbitrageExecutor.execute(arbitrage);
-        // }
-        // emit ArbitrageOpportunity(false);
+        (bool isFound, Arbitrage.Opportunity memory arbitrage) = arbitrageFinder
+            .find(token1, token2);
+
+        if (isFound) {
+            emit ArbitrageOpportunity(true);
+            arbitrageExecutor.execute(
+                arbitrage.firstTransaction.tokenFrom,
+                arbitrage.firstTransaction.tokenTo,
+                arbitrage.firstTransaction.exchange,
+                arbitrage.secondTransaction.exchange,
+                arbitrage.firstTransaction.amount
+            );
+        }
+        emit ArbitrageOpportunity(false);
     }
 }

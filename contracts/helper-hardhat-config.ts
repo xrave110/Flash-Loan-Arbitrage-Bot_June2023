@@ -11,6 +11,7 @@ const networkConfig = {
         velo_router_v2: "0x9c12939390052919aF3155f41Bf4160Fd3666A6f",
         sushiswap_router_v2: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
         uniswap_router_v3: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+        uniswap_router_quoter: "0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6",
         aavePoolDataProvider: "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb",
         //master_chef_v2: "0x0769fd68dFb93167989C6f7254cd0D766Fb2841F",
         ethUsdPriceFeed: "??",

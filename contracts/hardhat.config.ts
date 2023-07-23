@@ -4,54 +4,64 @@ import "dotenv/config";
 import * as crypto from "crypto";
 
 const {
-  LOCALHOST_OWNER_ADDRESS,
   OPT_GOERLI_ALCHEMY_URL,
   OPT_GOERLI_ACCOUNT_PRIVATE_KEY,
-  OPT_GOERLI_ACCOUNT_OWNER_ADDRESS,
-  GOERLI_ALCHEMY_URL,
-  GOERLI_ALCHEMY_PRIVATE_KEY,
-  GOERLI_ALCHEMY_OWNER_ADDRESS,
-  OPTIMISM_ALCHEMY_URL,
-  MAINNET_ALCHEMY_URL,
-  OPTIMISM_GOERLI_ALCHEMY_URL
+  OPT_MAINNET_ACCOUNT_PRIVATE_KEY,
+  OPT_MAINNET_ACCOUNT_PRIVATE_KEY_1,
+  OPT_MAINNET_ALCHEMY_URL,
 } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.0",
-      },
-      {
         version: "0.8.10",
       },
       {
         version: "0.8.19",
       },
-      {
-        version: "0.6.2",
-      },
     ],
   },
   defaultNetwork: "hardhat",
+  mocha: {
+    timeout: 100 * 1000,
+  },
   networks: {
     hardhat: {
-      chainId: 10,  // ganache-cli default chainId
+      chainId: 10,
       forking: {
-        url: `${OPTIMISM_ALCHEMY_URL}`,
+        enabled: true,
+        url: `${OPT_MAINNET_ALCHEMY_URL}`,
       },
-    },
-    optimism: {
-      url: `${OPTIMISM_ALCHEMY_URL}`,
-      accounts: [`0x${fetchEthAccountPrivateKey(GOERLI_ALCHEMY_PRIVATE_KEY)}`],
-      from: GOERLI_ALCHEMY_OWNER_ADDRESS,
-      gasPrice: 100000000,
+      accounts: [
+        {
+          privateKey: `0x${fetchEthAccountPrivateKey(
+            OPT_MAINNET_ACCOUNT_PRIVATE_KEY
+          )}`,
+          balance: "9999999999999999999999999999",
+        },
+        {
+          privateKey: `0x${fetchEthAccountPrivateKey(
+            OPT_MAINNET_ACCOUNT_PRIVATE_KEY_1
+          )}`,
+          balance: "9999999999999999999999999999",
+        },
+      ],
     },
     optimismGoerli: {
-      url: `${OPTIMISM_GOERLI_ALCHEMY_URL}`,
-      accounts: [`0x${fetchEthAccountPrivateKey(GOERLI_ALCHEMY_PRIVATE_KEY)}`],
-      from: GOERLI_ALCHEMY_OWNER_ADDRESS,
-      gasPrice: 100000000,
+      chainId: 420,
+      url: `${OPT_GOERLI_ALCHEMY_URL}`,
+      accounts: [
+        `0x${fetchEthAccountPrivateKey(OPT_GOERLI_ACCOUNT_PRIVATE_KEY)}`,
+      ],
+      gasPrice: 110000000,
+    },
+    optimismMainnet: {
+      chainId: 10,
+      url: `${OPT_MAINNET_ALCHEMY_URL}`,
+      accounts: [
+        `0x${fetchEthAccountPrivateKey(OPT_MAINNET_ACCOUNT_PRIVATE_KEY)}`,
+      ],
     },
   },
 };
