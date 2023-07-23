@@ -13,6 +13,7 @@ const {
   GOERLI_ALCHEMY_OWNER_ADDRESS,
   OPTIMISM_ALCHEMY_URL,
   MAINNET_ALCHEMY_URL,
+  OPTIMISM_GOERLI_ALCHEMY_URL
 } = process.env;
 
 const config: HardhatUserConfig = {
@@ -42,6 +43,12 @@ const config: HardhatUserConfig = {
     },
     optimism: {
       url: `${OPTIMISM_ALCHEMY_URL}`,
+      accounts: [`0x${fetchEthAccountPrivateKey(GOERLI_ALCHEMY_PRIVATE_KEY)}`],
+      from: GOERLI_ALCHEMY_OWNER_ADDRESS,
+      gasPrice: 100000000,
+    },
+    optimismGoerli: {
+      url: `${OPTIMISM_GOERLI_ALCHEMY_URL}`,
       accounts: [`0x${fetchEthAccountPrivateKey(GOERLI_ALCHEMY_PRIVATE_KEY)}`],
       from: GOERLI_ALCHEMY_OWNER_ADDRESS,
       gasPrice: 100000000,

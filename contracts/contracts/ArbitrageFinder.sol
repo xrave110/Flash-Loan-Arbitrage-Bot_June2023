@@ -8,9 +8,10 @@ import "../interfaces/IArbitrageFinder.sol";
 import "../lib/Arbitrage.sol";
 import "./Whitelisted.sol";
 import "../interfaces/IVeloRouter.sol";
+import "hardhat/console.sol";
 
 contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
-    uint PRICE_TOLERANCE_PERCENT = 2;
+    uint PRICE_TOLERANCE_PERCENT = 50; // 0.5%
     address VELO_ROUTER = 0x9c12939390052919aF3155f41Bf4160Fd3666A6f;
     address UNISWAP_V3_QUOTER = 0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6;
 
@@ -62,7 +63,7 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
                     return (true, arbitrage);
                 }
             } else {
-                if (isArbitrageEligible(veloswapPrice, uniswapPrice, 0)) {
+                if (isArbitrageEligible(veloswapPrice, uniswapPrice, 10)) {
                     arbitrage = Arbitrage.Opportunity(
                         Arbitrage.Transaction(
                             token1,
@@ -129,11 +130,15 @@ contract ArbitrageFinder is IArbitrageFinder, Whitelisted {
         uint256 lowerPrice,
         uint256 tradeAmount
     ) private view returns (bool) {
-        uint256 priceDifference = ((higherPrice - lowerPrice) * 10000) /
-            lowerPrice; // Calculate the price difference as a percentage
-        if (
-            priceDifference >= PRICE_TOLERANCE_PERCENT * 100 && tradeAmount > 0
-        ) {
+        uint256 priceDifference = ((higherPrice - lowerPrice) * 1000) /
+            lowerPrice; // Calculate the price difference as a percentage 10 = 1%
+        console.log(
+            "Price difference: %s vs Tolerance: %s\t tradeAmount: %s",
+            priceDifference,
+            PRICE_TOLERANCE_PERCENT,
+            tradeAmount
+        );
+        if (priceDifference >= PRICE_TOLERANCE_PERCENT && tradeAmount > 0) {
             return true;
         }
         return false;

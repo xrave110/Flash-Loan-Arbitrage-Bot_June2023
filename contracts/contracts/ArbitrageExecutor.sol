@@ -25,16 +25,29 @@ contract ArbitrageExecutor is
         tradeExecutor = ITradeExecutor(executorAddress);
     }
 
+    address lastExecutor;
+    bool flashloanFinished = true;
+
     function execute(
         address tokenFrom,
         address tokenTo,
         address dex1,
-        address dex2
+        address dex2,
+        uint256 amount
     ) external {
+        require(flashloanFinished, "Flashloan not finished");
+        flashloanFinished = false;
+        lastExecutor = msg.sender;
         address receiverAddress = address(this);
         uint16 referralCode = 0;
 
-        bytes memory params = abi.encode(tokenFrom, tokenTo, dex1, dex2);
+        bytes memory params = abi.encode(
+            tokenFrom,
+            tokenTo,
+            dex1,
+            dex2,
+            amount
+        );
 
         console.log(tokenFrom);
         console.log(tokenTo);
@@ -42,7 +55,7 @@ contract ArbitrageExecutor is
         POOL.flashLoanSimple(
             receiverAddress,
             tokenFrom,
-            10000000000,
+            amount,
             params,
             referralCode
         );
@@ -55,9 +68,15 @@ contract ArbitrageExecutor is
         address initiator,
         bytes calldata params
     ) external override returns (bool) {
-        (address tokenFrom, address tokenTo, address dex1, address dex2) = abi
-            .decode(params, (address, address, address, address));
-        uint256 _amount = 10000000000;
+        (
+            address tokenFrom,
+            address tokenTo,
+            address dex1,
+            address dex2,
+            uint256 _amount
+        ) = abi.decode(params, (address, address, address, address, uint256));
+
+        flashloanFinished = true;
 
         IERC20(tokenFrom).approve(address(tradeExecutor), _amount);
 
@@ -76,6 +95,15 @@ contract ArbitrageExecutor is
         IERC20(asset).approve(address(POOL), totalAmount);
 
         return true;
+    }
+
+    function withdrawProfit(address token) external {
+        require(lastExecutor == msg.sender, "Only last executor can withdraw");
+        require(flashloanFinished == true, "flashloan not finished");
+        IERC20(token).transfer(
+            lastExecutor,
+            IERC20(token).balanceOf(address(this))
+        );
     }
 
     receive() external payable {}

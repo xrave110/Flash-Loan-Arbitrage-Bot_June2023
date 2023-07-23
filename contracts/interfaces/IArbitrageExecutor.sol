@@ -8,6 +8,9 @@ interface IArbitrageExecutor {
         address tokenFrom,
         address tokenTo,
         address dex1,
-        address dex2
+        address dex2,
+        uint256 amount
     ) external;
+
+    function withdrawProfit(address token) external;
 }
